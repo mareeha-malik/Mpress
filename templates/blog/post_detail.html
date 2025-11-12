@@ -1,0 +1,192 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}{{ post.title }}{% endblock %}
+
+{% block extra_head %}
+<!-- Font Awesome (if not already in base.html) -->
+<link
+  rel="stylesheet"
+  href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+/>
+
+<style>
+  .like-button {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.25s ease;
+  }
+
+  .like-button:hover {
+    transform: scale(1.15);
+  }
+
+  /* Default heart (visible even when not liked) */
+  .like-button .fa-heart {
+    color: #d1d5db; /* light gray */
+    transition: color 0.3s ease, transform 0.2s ease, filter 0.3s ease;
+  }
+
+  /* When liked */
+  .like-button.liked .fa-heart {
+    color: #ff4b6e; /* pinkish red */
+    filter: drop-shadow(0 0 8px rgba(255, 75, 110, 0.7));
+    transform: scale(1.25);
+  }
+
+  /* Click animation */
+  @keyframes pop {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.4); }
+    100% { transform: scale(1.15); }
+  }
+  .like-button.pop .fa-heart { animation: pop 250ms ease forwards; }
+
+  .card {
+    background: rgba(255,255,255,0.05);
+    backdrop-filter: blur(12px);
+    border-radius: 1rem;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+  }
+</style>
+
+<script>
+  // CSRF helper
+  function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+      const cookies = document.cookie.split(';');
+      for (let i = 0; i < cookies.length; i++) {
+        const cookie = cookies[i].trim();
+        if (cookie.substring(0, name.length + 1) === (name + '=')) {
+          cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+          break;
+        }
+      }
+    }
+    return cookieValue;
+  }
+
+  document.addEventListener('DOMContentLoaded', function(){
+    const btn = document.getElementById('like-btn');
+    if (!btn) return;
+
+    btn.addEventListener('click', async function(e){
+      e.preventDefault();
+      const slug = btn.dataset.slug;
+      const url = `/post/${slug}/like/ajax/`;
+      const csrftoken = getCookie('csrftoken');
+
+      try {
+        const resp = await fetch(url, {
+          method: 'POST',
+          headers: {'X-CSRFToken': csrftoken},
+          credentials: 'same-origin'
+        });
+
+        if (!resp.ok) {
+          if (resp.status === 403) {
+            window.location = '/accounts/login/?next=' + encodeURIComponent(window.location.pathname);
+            return;
+          }
+          console.error('Like request failed', resp.status);
+          return;
+        }
+
+        const data = await resp.json();
+        const countEl = document.getElementById('like-count');
+        const icon = document.getElementById('like-icon');
+
+        if (typeof data.count !== 'undefined') countEl.textContent = data.count;
+
+        if (data.liked) {
+          icon.classList.remove('fa-regular');
+          icon.classList.add('fa-solid');
+          btn.classList.add('liked', 'pop');
+          setTimeout(() => btn.classList.remove('pop'), 350);
+        } else {
+          icon.classList.remove('fa-solid');
+          icon.classList.add('fa-regular');
+          btn.classList.remove('liked');
+        }
+      } catch (err) {
+        console.error('Like error', err);
+      }
+    });
+  });
+</script>
+{% endblock %}
+
+{% block content %}
+<article class="py-8">
+  <div class="card p-6">
+    {% if post.featured_image %}
+      <img src="{{ post.featured_image.url }}" class="w-full h-64 object-cover rounded-lg mb-4">
+    {% endif %}
+
+    <h1 class="text-3xl font-bold">{{ post.title }}</h1>
+  <div class="text-sm text-gray-400 mt-2">By <a href="{% url 'profile_detail' post.author.username %}" class="text-gray-300 hover:text-pink-500">{{ post.author.username }}</a> • {{ post.published_at|date:'M d, Y' }}</div>
+
+    <div class="mt-4 prose max-w-none">{{ post.content|linebreaks }}</div>
+
+    <div class="mt-6 flex items-center gap-6">
+      <!-- Heart Button -->
+      <div class="flex items-center gap-2 text-sm text-gray-300">
+        {% if liked_by_user %}
+          <button id="like-btn" data-slug="{{ post.slug }}" class="like-button liked" aria-label="Unlike this post">
+            <i id="like-icon" class="fa-solid fa-heart fa-xl"></i>
+          </button>
+        {% else %}
+          <button id="like-btn" data-slug="{{ post.slug }}" class="like-button" aria-label="Like this post">
+            <i id="like-icon" class="fa-regular fa-heart fa-xl"></i>
+          </button>
+        {% endif %}
+        <span id="like-count">{{ post.likes.count }}</span>
+      </div>
+
+      <!-- Tags -->
+      <div class="flex items-center gap-2 text-sm text-gray-400">
+        <i class="fa-solid fa-tags"></i>
+        <div class="flex gap-2 flex-wrap">
+          {% for t in post.tags.all %}
+            <a href="{% url 'tag_posts' t.slug %}"
+              class="px-2 py-1 rounded-full bg-gradient-to-r from-pink-200 via-purple-200 to-indigo-200 text-gray-700 hover:from-pink-300 hover:to-indigo-300 transition">
+              {{ t.name }}
+            </a>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Comments -->
+  <section class="mt-6">
+    <div class="card p-4">
+      <h3 class="font-semibold text-gray-200">Comments</h3>
+      <div class="mt-3">
+        {% for comment in post.comments.all %}
+          <div class="border-b border-gray-700/40 py-2">
+            <div class="text-sm font-semibold text-gray-300">
+              {% if comment.user %}{{ comment.user.username }}{% else %}Anonymous{% endif %}
+            </div>
+            <div class="text-sm text-gray-400">{{ comment.content }}</div>
+          </div>
+        {% empty %}
+          <p class="text-sm text-gray-500">No comments yet.</p>
+        {% endfor %}
+      </div>
+
+      <div class="mt-4">
+        <form method="post">
+          {% csrf_token %}
+          {{ comment_form.as_p }}
+          <button class="mt-2 px-4 py-2 rounded" style="background:var(--primary); color:white">Add Comment</button>
+        </form>
+      </div>
+    </div>
+  </section>
+</article>
+{% endblock %}

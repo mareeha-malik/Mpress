@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="400" viewBox="0 0 800 400">
+  <defs>
+    <linearGradient id="g" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0%" stop-color="#FDECEF"/>
+      <stop offset="100%" stop-color="#E9D5FF"/>
+    </linearGradient>
+  </defs>
+  <rect width="100%" height="100%" fill="url(#g)"/>
+  <g fill="#6B7280" font-family="sans-serif" font-size="36">
+    <text x="50%" y="48%" dominant-baseline="middle" text-anchor="middle">MPress</text>
+    <text x="50%" y="64%" dominant-baseline="middle" text-anchor="middle" font-size="18">Your default thumbnail</text>
+  </g>
+</svg>

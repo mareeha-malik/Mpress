@@ -1,0 +1,5 @@
+
+# Minimal requirements. Pillow (for ImageField support) is optional — install locally if needed.
+Django==5.2.8
+gunicorn==21.2.0
+

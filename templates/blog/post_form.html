@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+{% block title %}Create / Edit Post{% endblock %}
+{% block content %}
+<div class="max-w-3xl mx-auto py-8">
+  <div class="card p-6">
+    <h2 class="text-2xl font-bold text-gray-800">Create / Edit Post</h2>
+    <p class="text-sm text-gray-600 mt-1">Write your post and choose a category, tags and status.</p>
+
+    <form method="post" enctype="multipart/form-data" class="mt-6 space-y-4">
+      {% csrf_token %}
+
+      {% if form.non_field_errors %}
+        <div class="text-sm text-red-700 bg-red-50 border border-red-100 rounded p-3">
+          {% for err in form.non_field_errors %}{{ err }}{% if not forloop.last %}<br>{% endif %}{% endfor %}
+        </div>
+      {% endif %}
+
+      <div class="grid grid-cols-1 gap-4">
+        <div>
+          {{ form.title.label_tag }}
+          {{ form.title }}
+          {% for error in form.title.errors %}<p class="text-sm text-red-600 mt-1">{{ error }}</p>{% endfor %}
+        </div>
+
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            {{ form.category.label_tag }}
+            {{ form.category }}
+            {% for error in form.category.errors %}<p class="text-sm text-red-600 mt-1">{{ error }}</p>{% endfor %}
+          </div>
+          <div>
+            {{ form.status.label_tag }}
+            {{ form.status }}
+            {% for error in form.status.errors %}<p class="text-sm text-red-600 mt-1">{{ error }}</p>{% endfor %}
+          </div>
+        </div>
+
+        <div>
+          {{ form.tags.label_tag }}
+          {{ form.tags }}
+          <p class="text-xs text-gray-500 mt-1">Hold Ctrl (or Cmd) to select multiple tags.</p>
+          {% for error in form.tags.errors %}<p class="text-sm text-red-600 mt-1">{{ error }}</p>{% endfor %}
+        </div>
+
+        <div>
+          {{ form.content.label_tag }}
+          {{ form.content }}
+          {% for error in form.content.errors %}<p class="text-sm text-red-600 mt-1">{{ error }}</p>{% endfor %}
+        </div>
+
+        <div>
+          {{ form.featured_image.label_tag }}
+          {% if form.instance and form.instance.featured_image %}
+            <div class="mb-2">
+              <img src="{{ form.instance.featured_image.url }}" alt="current image" class="w-48 h-28 object-cover rounded-md shadow-sm" />
+            </div>
+          {% endif %}
+          {{ form.featured_image }}
+          <p class="text-xs text-gray-500 mt-1">Optional. Recommended image ratio 16:9.</p>
+          {% for error in form.featured_image.errors %}<p class="text-sm text-red-600 mt-1">{{ error }}</p>{% endfor %}
+        </div>
+      </div>
+
+      <div class="flex items-center gap-3">
+        <button type="submit" class="px-6 py-3 rounded-xl bg-gradient-to-r from-pink-200 via-purple-200 to-indigo-200 text-gray-800 font-semibold hover:scale-105 transition">Save</button>
+        <a href="{% url 'dashboard' %}" class="px-4 py-2 rounded-lg border border-gray-200 text-gray-700">Cancel</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

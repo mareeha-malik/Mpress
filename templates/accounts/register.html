@@ -1,0 +1,84 @@
+{% extends 'base.html' %}
+{% block title %}Register{% endblock %}
+
+{% block content %}
+<div class="min-h-screen flex items-center justify-center px-4 py-12 bg-transparent">
+
+  <!-- Glassmorphic Form Card -->
+  <div class="w-full max-w-md bg-white/60 backdrop-blur-xl border border-white/40 rounded-3xl shadow-md hover:shadow-xl transition p-8">
+
+    <!-- Hero / Header -->
+    <div class="flex items-center gap-4 mb-6">
+      <!-- <img src="https://via.placeholder.com/64" class="rounded-full ring-4 ring-white/60 shadow" alt="author"> -->
+      <div>
+        <h2 class="text-2xl font-bold text-gray-800 text-center">Create Your Account</h2>
+        <p class="text-sm text-gray-600 text-center">Join the community — it's quick and easy.</p>
+      </div>
+    </div>
+
+    <!-- Non-field errors -->
+    {% if form.non_field_errors %}
+      <div class="mb-4 text-sm text-red-700 bg-red-50 border border-red-100 rounded p-3">
+        {% for err in form.non_field_errors %}{{ err }}{% if not forloop.last %}<br>{% endif %}{% endfor %}
+      </div>
+    {% endif %}
+
+    <!-- Form -->
+    <form method="post" class="space-y-4">
+      {% csrf_token %}
+
+      {% for field in form %}
+        <div>
+          {{ field.label_tag }}
+          {{ field }}
+          {% if field.help_text %}
+            <p class="text-xs text-gray-500 mt-1">{{ field.help_text }}</p>
+          {% endif %}
+          {% for error in field.errors %}
+            <p class="text-sm text-red-600 mt-1">{{ error }}</p>
+          {% endfor %}
+        </div>
+      {% endfor %}
+
+      <button type="submit"
+              class="w-full py-3 bg-gradient-to-r from-pink-200 via-purple-200 to-indigo-200 text-gray-800 font-semibold rounded-xl shadow hover:scale-105 hover:from-pink-300 hover:via-purple-300 hover:to-indigo-300 transition-transform duration-300">
+        Register
+      </button>
+    </form>
+
+    <!-- Login Link -->
+    <p class="mt-6 text-center text-gray-700">
+      Already have an account? 
+      <a href="{% url 'login' %}" class="text-pink-500 font-semibold hover:underline">Login here</a>
+    </p>
+
+  </div>
+</div>
+
+<style>
+  /* Simple cross-browser styles so Django's default widgets look nice without changing widgets */
+  .w-full input, input, textarea, select, .w-full .field {
+    box-sizing: border-box;
+  }
+  form input[type="text"],
+  form input[type="email"],
+  form input[type="password"],
+  form textarea,
+  form select {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border-radius: 0.75rem;
+    background: rgba(255, 202, 231, 0);
+    border: 1px solid rgb(255, 181, 201);
+    color: #1f2937; /* gray-800 */
+    outline: none;
+    margin-top: 0.25rem;
+  }
+  form input:focus, form textarea:focus, form select:focus {
+    box-shadow: 0 0 0 4px rgba(236,72,153,0.08);
+    border-color: rgba(236, 72, 154, 0.847);
+  }
+  label { display:block; font-weight:600; color:#374151; }
+  .text-sm { font-size:0.875rem }
+</style>
+{% endblock %}

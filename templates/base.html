@@ -1,0 +1,139 @@
+{% load static %}
+{% load group_tags %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>MPress - {% block title %}{% endblock %}</title>
+
+  <!-- Tailwind via CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&family=Quicksand:wght@300;400;600&display=swap"
+    rel="stylesheet"
+  />
+
+  <!-- Font Awesome -->
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+    integrity="sha512-k6RqeWeci5ZR/Lv4MR0sA0FfDOMmVQ1pXqz1bZL+2s6p1v3zq6Q6Q0dK6G6gGQ2Y6Jv1q6y6Y6d6j6e6Z6G6g=="
+    crossorigin="anonymous"
+    referrerpolicy="no-referrer"
+  />
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="{% static 'favicon.svg' %}" />
+
+  <style>
+    :root {
+      --bg: #fff6f9;
+      --primary: #f9a8d4;
+      --secondary: #c7d2fe;
+      --accent: #fcd34d;
+      --text: #2e2e2e;
+    }
+    body {
+      font-family: "Poppins", "Quicksand", system-ui;
+      background: var(--bg);
+      color: var(--text);
+    }
+    .card {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 6px 18px rgba(46, 46, 46, 0.08);
+    }
+    .soft-gradient {
+      background: linear-gradient(
+        135deg,
+        rgba(249, 168, 212, 0.15),
+        rgba(199, 210, 254, 0.12)
+      );
+    }
+  </style>
+
+  {% block extra_head %}{% endblock %}
+</head>
+<body class="min-h-screen">
+
+  <!-- Navbar -->
+  <nav class="py-4 px-6 flex items-center justify-between bg-white shadow-sm">
+
+    <!-- Left: Search Bar -->
+    <div class="flex-1 flex items-center">
+      <form method="get" action="{% url 'search' %}" class="hidden sm:block">
+        <input
+          name="q"
+          placeholder="Search posts..."
+          class="px-3 py-2 rounded-full border bg-gray-50 border-transparent focus:outline-none focus:ring-2 focus:ring-pink-200"
+        />
+      </form>
+    </div>
+
+    <!-- Center: Logo -->
+    <div class="flex-shrink-0">
+      <a href="{% url 'home' %}" class="flex items-center justify-center">
+        <img
+          src="{% static 'MPress2.svg' %}"
+          alt="MPress Logo"
+          class="h-10 w-auto"
+        />
+      </a>
+    </div>
+
+    <!-- Right: Auth Buttons -->
+    <div class="flex-1 flex items-center justify-end gap-3">
+      {% if user.is_authenticated %}
+        {% in_group user 'Author' as can_dashboard %}
+        {% if can_dashboard %}
+          <a
+            href="{% url 'dashboard' %}"
+            class="text-sm px-3 py-1 rounded-md bg-white text-gray-800"
+            style="border:1px solid var(--primary);"
+          >Dashboard</a>
+        {% endif %}
+
+        <!-- My profile link -->
+        <a href="{% url 'profile_detail' user.username %}" class="text-sm px-3 py-1 rounded-md bg-white text-gray-800" style="border:1px solid var(--primary);">My profile</a>
+
+        <form method="post" action="{% url 'logout' %}" class="m-0">
+          {% csrf_token %}
+          <button
+            type="submit"
+            class="text-sm px-3 py-1 rounded-md text-white"
+            style="background: var(--primary);"
+          >
+            Logout
+          </button>
+        </form>
+      {% else %}
+        <a
+          href="{% url 'login' %}"
+          class="text-sm px-3 py-1 rounded-md bg-white text-gray-800"
+          style="border:1px solid var(--primary);"
+        >Login</a>
+        <a
+          href="{% url 'register' %}"
+          class="text-sm px-3 py-1 rounded-md text-white"
+          style="background: var(--primary);"
+        >Register</a>
+      {% endif %}
+      <!-- Subscribe button removed as requested -->
+    </div>
+
+  </nav>
+
+  <!-- Main Content -->
+  <main class="container mx-auto mt-6 px-4">
+    {% block content %}{% endblock %}
+  </main>
+
+  <!-- Footer -->
+  <footer class="mt-12 py-8 text-center text-sm text-gray-500">
+    © {{ now.year }} MPress • let your thoughts wander
+  </footer>
+
+</body>
+</html>

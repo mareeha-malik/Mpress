@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% block title %}Dashboard{% endblock %}
+{% block content %}
+<section class="py-8">
+  <h2 class="text-2xl font-semibold mb-4">Your Posts</h2>
+  <a href="{% url 'post_create' %}" class="px-3 py-2 rounded inline-flex items-center gap-2" style="background:var(--primary); color:white"><i class="fa-solid fa-plus"></i>New Post</a>
+  <div class="mt-4 grid gap-4">
+    {% for post in posts %}
+      <div class="card p-4 flex items-center justify-between">
+        <div>
+          <div class="font-semibold">{{ post.title }}</div>
+          <div class="text-sm text-gray-500">{{ post.status }} • {{ post.published_at|default:post.created_at|date:'M d, Y' }}</div>
+        </div>
+        <div class="space-x-2">
+          <a href="{% url 'post_edit' post.slug %}" class="text-sm inline-flex items-center gap-2"><i class="fa-regular fa-pen-to-square"></i>Edit</a>
+          <a href="{% url 'post_delete' post.slug %}" class="text-sm text-red-500 inline-flex items-center gap-2"><i class="fa-solid fa-trash"></i>Delete</a>
+        </div>
+      </div>
+    {% empty %}
+      <p class="text-gray-600">You have no posts yet.</p>
+    {% endfor %}
+  </div>
+</section>
+{% endblock %}
