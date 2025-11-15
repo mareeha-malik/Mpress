@@ -20,12 +20,17 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-dg-_q)qiuntp&aztqohlqh$)3v%26o^r0*c3%gpm%c+&+wdh$k'
+import os
+from pathlib import Path
+
+SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-dg-_q)qiuntp&aztqohlqh$)3v%26o^r0*c3%gpm%c+&+wdh$k')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.environ.get('DEBUG', 'False') == 'True'
 
-ALLOWED_HOSTS = ['mpress.up.railway.app', 'mpress-production.up.railway.app', '127.0.0.1', 'localhost']
+ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', 'localhost 127.0.0.1').split()
+# For PythonAnywhere, add your username and domain
+ALLOWED_HOSTS += ['mpress.pythonanywhere.com']
 
 
 # Application definition
@@ -122,7 +127,8 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
 STATICFILES_DIRS = [BASE_DIR / 'static']
 
 # Media files for uploaded images
@@ -138,3 +144,36 @@ LOGOUT_REDIRECT_URL = '/'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# ============================================
+# PythonAnywhere Deployment Configuration
+# ============================================
+
+# Security settings for production
+if not DEBUG:
+    # HTTPS and Security Headers
+    SECURE_BROWSER_XSS_FILTER = True
+    SECURE_CONTENT_SECURITY_POLICY = {
+        "default-src": ("'self'",),
+        "script-src": ("'self'", "cdn.tailwindcss.com"),
+        "style-src": ("'self'", "cdn.tailwindcss.com", "'unsafe-inline'"),
+    }
+    
+    # Cookie security
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    SESSION_COOKIE_HTTPONLY = True
+    
+    # HSTS (optional, use carefully)
+    SECURE_HSTS_SECONDS = 31536000  # 1 year
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_PRELOAD = True
+    
+    # Enforce HTTPS
+    SECURE_SSL_REDIRECT = False  # Set to True if PythonAnywhere has SSL enabled
+
+# Whitenoise for serving static files
+MIDDLEWARE.insert(1, 'whitenoise.middleware.WhiteNoiseMiddleware')
+
+# Optional: Cache static files
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
