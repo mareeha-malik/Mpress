@@ -18,7 +18,7 @@ SECRET_KEY = 'django-insecure-dg-_q)qiuntp&aztqohlqh$)3v%26o^r0*c3%gpm%c+&+wdh$k
 
 DEBUG = False  # Turn off debug in production
 
-ALLOWED_HOSTS = ['mpress.up.railway.app', '127.0.0.1', 'localhost']
+ALLOWED_HOSTS = ['mpress.up.railway.app', 'mpress-production.up.railway.app', '127.0.0.1', 'localhost']
 
 
 # ------------------------------------------------------------
@@ -145,5 +145,5 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # DEPLOYMENT SETTINGS
 # ------------------------------------------------------------
 # Security enhancements (optional but recommended)
-CSRF_TRUSTED_ORIGINS = ['https://mpress.up.railway.app']
+CSRF_TRUSTED_ORIGINS = ['https://mpress.up.railway.app', 'https://mpress-production.up.railway.app']
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
