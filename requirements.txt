@@ -3,4 +3,5 @@
 Django==5.2.8
 gunicorn==21.2.0
 whitenoise
+Pillow>=10.0
 
