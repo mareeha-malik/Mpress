@@ -134,8 +134,8 @@ class PostCreateView(LoginRequiredMixin, GroupRequiredMixin, CreateView):
 
     def form_valid(self, form):
         form.instance.author = self.request.user
-        if form.cleaned_data.get('status') == 'published' and not form.instance.published_at:
-            form.instance.published_at = timezone.now()
+        # Force new posts to always be pending
+        form.instance.status = 'pending'
         return super().form_valid(form)
 
 

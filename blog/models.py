@@ -36,7 +36,7 @@ class Tag(models.Model):
 
 class Post(models.Model):
     STATUS_CHOICES = [
-        ('draft', 'Draft'),
+        ('pending', 'Pending'),
         ('published', 'Published'),
     ]
 
@@ -47,7 +47,7 @@ class Post(models.Model):
     tags = models.ManyToManyField(Tag, blank=True)
     content = models.TextField()
     featured_image = models.ImageField(upload_to='posts/', null=True, blank=True)
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='draft')
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     published_at = models.DateTimeField(null=True, blank=True)

@@ -18,6 +18,20 @@ class PostAdmin(admin.ModelAdmin):
     list_filter = ('status', 'category', 'author')
     search_fields = ('title', 'content')
     prepopulated_fields = {'slug': ('title',)}
+    actions = ['approve_posts']
+
+    def approve_posts(self, request, queryset):
+        """Admin action to approve pending posts."""
+        from django.utils import timezone
+        updated = 0
+        for post in queryset.filter(status='pending'):
+            post.status = 'published'
+            post.published_at = timezone.now()
+            post.save()
+            updated += 1
+        self.message_user(request, f'{updated} post(s) have been approved and published.')
+    
+    approve_posts.short_description = "Approve selected pending posts"
 
 
 @admin.register(Comment)
