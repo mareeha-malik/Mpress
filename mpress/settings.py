@@ -30,7 +30,7 @@ DEBUG = os.environ.get('DEBUG', 'False') == 'True'
 
 ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', 'localhost 127.0.0.1').split()
 # For PythonAnywhere, add your username and domain
-ALLOWED_HOSTS += ['mpress.pythonanywhere.com']
+ALLOWED_HOSTS += ['mpress.pythonanywhere.com','https://mpress.onrender.com']
 
 
 # Application definition
