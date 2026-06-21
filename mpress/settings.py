@@ -22,7 +22,11 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY WARNING: keep the secret key used in production secret!
 import os
 from pathlib import Path
+import cloudinary
 
+from dotenv import load_dotenv
+
+load_dotenv()
 SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-dg-_q)qiuntp&aztqohlqh$)3v%26o^r0*c3%gpm%c+&+wdh$k')
 
 # SECURITY WARNING: don't run with debug turned on in production!
@@ -36,7 +40,14 @@ ALLOWED_HOSTS = [
     "localhost",
     "127.0.0.1"
 ]
+import cloudinary
 
+cloudinary.config(
+    cloud_name=os.getenv("CLOUDINARY_CLOUD_NAME"),
+    api_key=os.getenv("CLOUDINARY_API_KEY"),
+    api_secret=os.getenv("CLOUDINARY_API_SECRET"),
+    secure=True
+)
 # Application definition
 
 INSTALLED_APPS = [
@@ -46,6 +57,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'cloudinary',
+    'cloudinary_storage',
 ]
 
 # Local apps
@@ -181,3 +194,5 @@ MIDDLEWARE.insert(1, 'whitenoise.middleware.WhiteNoiseMiddleware')
 
 # Optional: Cache static files
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
+DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
