@@ -18,7 +18,7 @@ SECRET_KEY = 'django-insecure-dg-_q)qiuntp&aztqohlqh$)3v%26o^r0*c3%gpm%c+&+wdh$k
 
 DEBUG = False  # Turn off debug in production
 
-ALLOWED_HOSTS = ['mpress.up.railway.app', 'mpress-production.up.railway.app', '127.0.0.1', 'localhost']
+ALLOWED_HOSTS = ['*']
 
 
 # ------------------------------------------------------------
