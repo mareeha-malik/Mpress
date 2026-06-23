@@ -66,9 +66,9 @@ INSTALLED_APPS = [
     'cloudinary',
     'cloudinary_storage',
 
-    # Local apps
-    'accounts',
-    'blog',
+    # Local apps (use full AppConfig path to ensure ready() is called)
+    'accounts.apps.AccountsConfig',
+    'blog.apps.BlogConfig',
 ]
 
 # =========================
@@ -112,12 +112,45 @@ WSGI_APPLICATION = 'mpress.wsgi.application'
 # =========================
 # DATABASE
 # =========================
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+# Support DATABASE_URL for CI/production environments (e.g., postgres://user:pass@host:port/dbname)
+# Fall back to SQLite for local development
+database_url = os.environ.get('DATABASE_URL')
+
+if database_url:
+    # Use dj-database-url if available, otherwise parse manually
+    try:
+        import dj_database_url
+        DATABASES = {'default': dj_database_url.config(default=database_url, conn_max_age=600)}
+    except ImportError:
+        # Manual parsing for postgres URLs
+        if 'postgres' in database_url or 'postgresql' in database_url:
+            from urllib.parse import urlparse
+            parsed = urlparse(database_url)
+            DATABASES = {
+                'default': {
+                    'ENGINE': 'django.db.backends.postgresql',
+                    'NAME': parsed.path.lstrip('/'),
+                    'USER': parsed.username,
+                    'PASSWORD': parsed.password,
+                    'HOST': parsed.hostname,
+                    'PORT': parsed.port or 5432,
+                }
+            }
+        else:
+            DATABASES = {
+                'default': {
+                    'ENGINE': 'django.db.backends.sqlite3',
+                    'NAME': BASE_DIR / 'db.sqlite3',
+                }
+            }
+else:
+    # Local development defaults to SQLite
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
     }
-}
 
 # =========================
 # AUTH PASSWORD VALIDATORS
