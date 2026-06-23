@@ -73,7 +73,6 @@ INSTALLED_APPS = [
     # third-party
     'cloudinary',
     'cloudinary_storage',
-    'humanize',
 ]
 
 # Local apps
