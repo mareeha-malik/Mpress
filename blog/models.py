@@ -1,8 +1,7 @@
 from django.db import models
-from django.contrib.auth.models import User
+from django.conf import settings
 from django.utils.text import slugify
 from django.urls import reverse
-from django.contrib.auth.models import User
 
 
 class Category(models.Model):
@@ -42,12 +41,35 @@ class Post(models.Model):
 
     title = models.CharField(max_length=255)
     slug = models.SlugField(unique=True, blank=True)
-    author = models.ForeignKey(User, on_delete=models.CASCADE, related_name='posts')
-    category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, blank=True)
+
+    author = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='posts'
+    )
+
+    category = models.ForeignKey(
+        Category,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True
+    )
+
     tags = models.ManyToManyField(Tag, blank=True)
     content = models.TextField()
-    featured_image = models.ImageField(upload_to='posts/', null=True, blank=True)
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
+
+    featured_image = models.ImageField(
+        upload_to='posts/',
+        null=True,
+        blank=True
+    )
+
+    status = models.CharField(
+        max_length=20,
+        choices=STATUS_CHOICES,
+        default='pending'
+    )
+
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     published_at = models.DateTimeField(null=True, blank=True)
@@ -63,11 +85,13 @@ class Post(models.Model):
             base_slug = slugify(self.title)
             slug = base_slug
             counter = 1
-            # ensure uniqueness
-            while Post.objects.filter(slug=slug).exclude(pk=getattr(self, 'pk', None)).exists():
+
+            while Post.objects.filter(slug=slug).exclude(pk=self.pk).exists():
                 slug = f"{base_slug}-{counter}"
                 counter += 1
+
             self.slug = slug
+
         super().save(*args, **kwargs)
 
     def get_absolute_url(self):
@@ -75,8 +99,19 @@ class Post(models.Model):
 
 
 class Comment(models.Model):
-    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='comments')
-    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
+    post = models.ForeignKey(
+        Post,
+        on_delete=models.CASCADE,
+        related_name='comments'
+    )
+
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True
+    )
+
     content = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
     approved = models.BooleanField(default=True)
@@ -86,8 +121,18 @@ class Comment(models.Model):
 
 
 class Like(models.Model):
-    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='likes')
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='likes')
+    post = models.ForeignKey(
+        Post,
+        on_delete=models.CASCADE,
+        related_name='likes'
+    )
+
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='likes'
+    )
+
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
