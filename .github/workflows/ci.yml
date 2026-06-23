@@ -9,6 +9,13 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    env:
+      DJANGO_SETTINGS_MODULE: mpress.settings
+      DATABASE_URL: postgres://postgres:postgres@127.0.0.1:5432/test_db
+      PGUSER: postgres
+      PGPASSWORD: postgres
+      PGHOST: 127.0.0.1
+      PGPORT: 5432
 
     services:
       postgres:
@@ -20,7 +27,7 @@ jobs:
         ports:
           - 5432:5432
         options: >-
-          --health-cmd pg_isready
+          --health-cmd "pg_isready -U postgres -d test_db"
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
@@ -38,22 +45,16 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Run migrations and tests
-        env:
-          DJANGO_SETTINGS_MODULE: mpress.settings
-          DATABASE_URL: postgres://postgres:postgres@localhost:5432/test_db
-          PGUSER: postgres
-          PGPASSWORD: postgres
-          PGHOST: localhost
-          PGPORT: 5432
+      - name: Wait for PostgreSQL
         run: |
-          # Wait for PostgreSQL to be ready
-          until pg_isready -h localhost -p 5432 -U postgres; do
+          until pg_isready -h 127.0.0.1 -p 5432 -U postgres -d test_db; do
             echo "Waiting for PostgreSQL..."
             sleep 1
           done
-          
           echo "PostgreSQL is ready!"
+
+      - name: Run migrations and tests
+        run: |
           python manage.py check
           python manage.py migrate
           python manage.py collectstatic --noinput
