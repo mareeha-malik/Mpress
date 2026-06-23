@@ -3,14 +3,12 @@ from django.urls import reverse
 from django.contrib.auth import get_user_model
 from django.utils import timezone
 
-from .models import Post, Category, Tag
-
-User = get_user_model()
-
 
 class BlogSmokeTests(TestCase):
 
     def setUp(self):
+        from .models import Category
+        User = get_user_model()
         self.client = Client()
         self.user = User.objects.create_user(
             username='tester',
@@ -23,6 +21,7 @@ class BlogSmokeTests(TestCase):
         self.assertEqual(resp.status_code, 200)
 
     def test_post_creation_and_detail(self):
+        from .models import Post
         post = Post.objects.create(
             title='T1',
             content='Hello',
@@ -40,6 +39,7 @@ class BlogSmokeTests(TestCase):
         self.assertContains(resp, 'T1')
 
     def test_like_toggle(self):
+        from .models import Post
         post = Post.objects.create(
             title='LikeMe',
             content='Hi',

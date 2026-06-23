@@ -1,6 +1,5 @@
 from django.test import TestCase, override_settings
-from django.contrib.auth.models import User
-from .models import Profile
+from django.contrib.auth import get_user_model
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.exceptions import ValidationError
 
@@ -8,6 +7,8 @@ from django.core.exceptions import ValidationError
 class ProfileModelTests(TestCase):
 
     def test_profile_created_on_user_creation(self):
+        from .models import Profile
+        User = get_user_model()
         u = User.objects.create_user(username='alice', password='pass')
         # Profile should be auto-created by signals
         self.assertTrue(hasattr(u, 'profile'))
@@ -18,6 +19,7 @@ class ProfileModelTests(TestCase):
 class ProfileFormValidationTests(TestCase):
 
     def setUp(self):
+        User = get_user_model()
         self.user = User.objects.create_user(username='bob', password='pass')
 
     def test_avatar_accepts_image(self):
