@@ -200,10 +200,10 @@
       {% if user.is_authenticated %}
         {% in_group user 'Author' as can_dashboard %}
         {% if can_dashboard %}
-          <a href="{% url 'dashboard' %}" class="text-sm px-3 py-1.5 doodle-btn bg-white text-gray-800">📋 Dashboard</a>
+          <a href="{% url 'dashboard' %}" class="text-sm px-3 py-1.5 doodle-btn bg-white text-gray-800"> Dashboard</a>
         {% endif %}
 
-        <a href="{% url 'profile_detail' user.username %}" class="text-sm px-3 py-1.5 doodle-btn bg-white text-gray-800">👤 My profile</a>
+        <a href="{% url 'profile_detail' user.username %}" class="text-sm px-3 py-1.5 doodle-btn bg-white text-gray-800"> My profile</a>
 
         <form method="post" action="{% url 'logout' %}" class="m-0">
           {% csrf_token %}
