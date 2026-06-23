@@ -11,7 +11,7 @@
   <!-- Tailwind via CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <link
-    href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&family=Quicksand:wght@300;400;600&display=swap"
+    href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;600;700&family=Quicksand:wght@300;400;500;600;700&display=swap"
     rel="stylesheet"
   />
 
@@ -19,7 +19,6 @@
   <link
     rel="stylesheet"
     href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
-    integrity="sha512-k6RqeWeci5ZR/Lv4MR0sA0FfDOMmVQ1pXqz1bZL+2s6p1v3zq6Q6Q0dK6G6gGQ2Y6Jv1q6y6Y6d6j6e6Z6G6g=="
     crossorigin="anonymous"
     referrerpolicy="no-referrer"
   />
@@ -29,57 +28,170 @@
 
   <style>
     :root {
-      --bg: #fff6f9;
-      --primary: #f9a8d4;
-      --secondary: #c7d2fe;
-      --accent: #fcd34d;
-      --text: #2e2e2e;
+      --bg: #fffaf3;
+      --paper: #fffdf8;
+      --blush: #ffd3e6;
+      --blush-deep: #ff9ec7;
+      --lilac: #e3d8ff;
+      --lilac-deep: #b7a2f5;
+      --butter: #ffe8a3;
+      --sage: #bfe8cf;
+      --ink: #4a3f4e;
+      --ink-soft: #8a7d92;
+      --line: #4a3f4e;
     }
+
     body {
-      font-family: "Poppins", "Quicksand", system-ui;
-      background: var(--bg);
-      color: var(--text);
+      font-family: "Quicksand", system-ui, sans-serif;
+      background-color: var(--bg);
+      background-image:
+        radial-gradient(circle at 8% 12%, rgba(255, 211, 230, 0.35) 0, transparent 38%),
+        radial-gradient(circle at 92% 18%, rgba(227, 216, 255, 0.35) 0, transparent 40%),
+        radial-gradient(circle at 50% 95%, rgba(191, 232, 207, 0.25) 0, transparent 45%);
+      color: var(--ink);
     }
-    .card {
-      background: white;
-      border-radius: 12px;
-      box-shadow: 0 6px 18px rgba(46, 46, 46, 0.08);
+
+    .font-doodle { font-family: "Caveat", cursive; }
+
+    /* Hand-drawn wobbly card */
+    .doodle-card {
+      background: var(--paper);
+      border: 2.5px solid var(--line);
+      border-radius: 22px 26px 20px 28px;
+      box-shadow: 4px 5px 0px 0px rgba(74, 63, 78, 0.18);
+      position: relative;
+      transition: transform 0.18s ease, box-shadow 0.18s ease;
     }
-    .soft-gradient {
-      background: linear-gradient(
-        135deg,
-        rgba(249, 168, 212, 0.15),
-        rgba(199, 210, 254, 0.12)
-      );
+    .doodle-card:hover {
+      transform: translate(-2px, -3px) rotate(-0.3deg);
+      box-shadow: 6px 8px 0px 0px rgba(74, 63, 78, 0.22);
     }
+
+    /* squiggle underline for headings */
+    .squiggle-underline {
+      position: relative;
+      display: inline-block;
+    }
+    .squiggle-underline::after {
+      content: "";
+      position: absolute;
+      left: 0; right: 0; bottom: -6px;
+      height: 8px;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='8' viewBox='0 0 60 8'%3E%3Cpath d='M0 4 Q5 0 10 4 T20 4 T30 4 T40 4 T50 4 T60 4' stroke='%23ff9ec7' stroke-width='2.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+      background-repeat: repeat-x;
+      background-size: 30px 8px;
+    }
+
+    .doodle-btn {
+      border: 2.5px solid var(--line);
+      border-radius: 14px;
+      box-shadow: 3px 3px 0px 0px var(--line);
+      transition: transform 0.12s ease, box-shadow 0.12s ease;
+      font-weight: 600;
+    }
+    .doodle-btn:hover {
+      transform: translate(-1px, -2px);
+      box-shadow: 4px 5px 0px 0px var(--line);
+    }
+    .doodle-btn:active {
+      transform: translate(0px, 0px);
+      box-shadow: 1px 1px 0px 0px var(--line);
+    }
+
+    .pill-tag {
+      border: 2px dashed var(--line);
+      border-radius: 999px;
+    }
+
+    .washi-corner {
+      position: absolute;
+      top: -10px;
+      left: 16px;
+      width: 46px;
+      height: 18px;
+      background: var(--butter);
+      border: 1.5px solid var(--line);
+      transform: rotate(-4deg);
+      opacity: 0.9;
+    }
+
+    input, select, textarea {
+      font-family: "Quicksand", sans-serif !important;
+      border: 2px solid var(--line) !important;
+      border-radius: 12px !important;
+      background: var(--paper) !important;
+      padding: 0.55rem 0.8rem !important;
+    }
+    input:focus, select:focus, textarea:focus {
+      outline: none !important;
+      box-shadow: 0 0 0 3px var(--blush) !important;
+    }
+
+    /* floating doodle decorations */
+    .doodle-deco {
+      position: absolute;
+      pointer-events: none;
+      opacity: 0.55;
+    }
+    .float-slow { animation: floaty 6s ease-in-out infinite; }
+    .float-slow2 { animation: floaty 7.5s ease-in-out infinite 1s; }
+    @keyframes floaty {
+      0%, 100% { transform: translateY(0) rotate(0deg); }
+      50% { transform: translateY(-8px) rotate(4deg); }
+    }
+
+    /* Toast / modal for pending approval */
+    .toast-pop {
+      animation: pop-in 0.3s cubic-bezier(.34,1.56,.64,1);
+    }
+    @keyframes pop-in {
+      0% { transform: scale(0.7) translateY(10px); opacity: 0; }
+      100% { transform: scale(1) translateY(0); opacity: 1; }
+    }
+
+    .status-badge {
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 0.15rem 0.65rem;
+      border-radius: 999px;
+      border: 1.5px solid var(--line);
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+    }
+    .status-published { background: var(--sage); }
+    .status-pending { background: var(--butter); }
+    .status-draft { background: #eee; }
   </style>
 
   {% block extra_head %}{% endblock %}
 </head>
-<body class="min-h-screen">
+<body class="min-h-screen relative">
+
+  <!-- scattered doodle decorations -->
+  <svg class="doodle-deco float-slow" style="top:70px; left:2%; width:38px;" viewBox="0 0 24 24" fill="none" stroke="#ff9ec7" stroke-width="1.8"><path d="M12 21s-7-4.35-9.5-9C.5 8 2.5 4 6.5 4c2 0 3.5 1.2 4 2.5C11 5.2 12.5 4 14.5 4 18.5 4 20.5 8 19.5 12 17 16.65 12 21 12 21z"/></svg>
+  <svg class="doodle-deco float-slow2" style="top:140px; right:3%; width:30px;" viewBox="0 0 24 24" fill="none" stroke="#b7a2f5" stroke-width="1.8"><path d="M12 2l1.6 5.1L19 7l-4 3.4L16.4 16 12 12.8 7.6 16 9 10.4 5 7l5.4.1z"/></svg>
 
   <!-- Navbar -->
-  <nav class="py-4 px-6 flex items-center justify-between bg-white shadow-sm">
+  <nav class="py-4 px-6 flex items-center justify-between bg-white/90 backdrop-blur border-b-2" style="border-color:var(--line);">
 
     <!-- Left: Search Bar -->
     <div class="flex-1 flex items-center">
       <form method="get" action="{% url 'search' %}" class="hidden sm:block">
         <input
           name="q"
-          placeholder="Search posts..."
-          class="px-3 py-2 rounded-full border bg-gray-50 border-transparent focus:outline-none focus:ring-2 focus:ring-pink-200"
+          placeholder="✦ search for cozy reads..."
+          class="px-3 py-1.5 text-sm"
+          style="min-width:220px;"
         />
       </form>
     </div>
 
     <!-- Center: Logo -->
     <div class="flex-shrink-0">
-      <a href="{% url 'home' %}" class="flex items-center justify-center">
-        <img
-          src="{% static 'MPress2.svg' %}"
-          alt="MPress Logo"
-          class="h-10 w-auto"
-        />
+      <a href="{% url 'home' %}" class="flex items-center justify-center gap-1">
+        <img src="{% static 'MPress2.svg' %}" alt="MPress Logo" class="h-10 w-auto" />
+        <span class="font-doodle text-2xl" style="color:var(--blush-deep);">✎</span>
       </a>
     </div>
 
@@ -88,52 +200,67 @@
       {% if user.is_authenticated %}
         {% in_group user 'Author' as can_dashboard %}
         {% if can_dashboard %}
-          <a
-            href="{% url 'dashboard' %}"
-            class="text-sm px-3 py-1 rounded-md bg-white text-gray-800"
-            style="border:1px solid var(--primary);"
-          >Dashboard</a>
+          <a href="{% url 'dashboard' %}" class="text-sm px-3 py-1.5 doodle-btn bg-white text-gray-800">📋 Dashboard</a>
         {% endif %}
 
-        <!-- My profile link -->
-        <a href="{% url 'profile_detail' user.username %}" class="text-sm px-3 py-1 rounded-md bg-white text-gray-800" style="border:1px solid var(--primary);">My profile</a>
+        <a href="{% url 'profile_detail' user.username %}" class="text-sm px-3 py-1.5 doodle-btn bg-white text-gray-800">👤 My profile</a>
 
         <form method="post" action="{% url 'logout' %}" class="m-0">
           {% csrf_token %}
-          <button
-            type="submit"
-            class="text-sm px-3 py-1 rounded-md text-white"
-            style="background: var(--primary);"
-          >
+          <button type="submit" class="text-sm px-3 py-1.5 doodle-btn text-gray-800" style="background: var(--blush);">
             Logout
           </button>
         </form>
       {% else %}
-        <a
-          href="{% url 'login' %}"
-          class="text-sm px-3 py-1 rounded-md bg-white text-gray-800"
-          style="border:1px solid var(--primary);"
-        >Login</a>
-        <a
-          href="{% url 'register' %}"
-          class="text-sm px-3 py-1 rounded-md text-white"
-          style="background: var(--primary);"
-        >Register</a>
+        <a href="{% url 'login' %}" class="text-sm px-3 py-1.5 doodle-btn bg-white text-gray-800">Login</a>
+        <a href="{% url 'register' %}" class="text-sm px-3 py-1.5 doodle-btn text-gray-800" style="background: var(--butter);">Register ✦</a>
       {% endif %}
-      <!-- Subscribe button removed as requested -->
     </div>
 
   </nav>
 
   <!-- Main Content -->
-  <main class="container mx-auto mt-6 px-4">
+  <main class="container mx-auto mt-6 px-4 relative">
     {% block content %}{% endblock %}
   </main>
 
   <!-- Footer -->
-  <footer class="mt-12 py-8 text-center text-sm text-gray-500">
+  <footer class="mt-12 py-8 text-center text-sm text-gray-500 relative">
+    <span class="font-doodle text-lg" style="color:var(--blush-deep);">~</span>
     © {{ now.year }} MPress • let your thoughts wander
+    <span class="font-doodle text-lg" style="color:var(--lilac-deep);">~</span>
   </footer>
+
+  <!-- ===== Shared pending-approval toast ===== -->
+  <div id="mp-toast-root" class="fixed bottom-6 right-6 z-50 flex flex-col gap-3 items-end"></div>
+  <script>
+    // Reusable cute toast. Call window.mpToast("message", "pending"|"success"|"info")
+    window.mpToast = function (message, kind) {
+      kind = kind || "info";
+      const colors = {
+        pending: "var(--butter)",
+        success: "var(--sage)",
+        info: "var(--lilac)"
+      };
+      const icons = { pending: "⏳", success: "🌸", info: "✦" };
+      const root = document.getElementById("mp-toast-root");
+      const el = document.createElement("div");
+      el.className = "toast-pop doodle-card px-4 py-3 max-w-xs flex items-start gap-2";
+      el.style.background = colors[kind] || "white";
+      el.innerHTML =
+        '<span style="font-size:1.1rem;">' + icons[kind] + '</span>' +
+        '<span class="text-sm font-medium" style="color:var(--ink);">' + message + '</span>';
+      root.appendChild(el);
+      setTimeout(() => {
+        el.style.transition = "opacity .4s, transform .4s";
+        el.style.opacity = "0";
+        el.style.transform = "translateY(10px)";
+        setTimeout(() => el.remove(), 400);
+      }, 5000);
+    };
+  </script>
+
+  {% block extra_scripts %}{% endblock %}
 
 </body>
 </html>

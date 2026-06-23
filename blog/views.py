@@ -138,11 +138,24 @@ class PostCreateView(LoginRequiredMixin, GroupRequiredMixin, CreateView):
         form.instance.status = 'pending'
         return super().form_valid(form)
 
+    def get_success_url(self):
+        # Never send the user to the post's own page here: a brand new post
+        # is always 'pending', and post_detail only serves published posts
+        # (that mismatch was the source of the 404 after submitting). Send
+        # them back to the dashboard instead, which can show a status toast.
+        return f"{reverse_lazy('dashboard')}?submitted=1&status={self.object.status}"
+
 
 class PostUpdateView(LoginRequiredMixin, AuthorRequiredMixin, UpdateView):
     model = Post
     form_class = PostForm
     template_name = 'blog/post_form.html'
+
+    def get_success_url(self):
+        # Same reasoning as above: an edited post may now be pending/draft,
+        # so don't rely on get_absolute_url() — go to the dashboard, where
+        # the post's current status is always visible.
+        return f"{reverse_lazy('dashboard')}?submitted=1&status={self.object.status}"
 
 
 class PostDeleteView(LoginRequiredMixin, AuthorRequiredMixin, DeleteView):

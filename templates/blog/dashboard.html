@@ -1,24 +1,64 @@
 {% extends 'base.html' %}
 {% block title %}Dashboard{% endblock %}
 {% block content %}
-<section class="py-8">
-  <h2 class="text-2xl font-semibold mb-4">Your Posts</h2>
-  <a href="{% url 'post_create' %}" class="px-3 py-2 rounded inline-flex items-center gap-2" style="background:var(--primary); color:white"><i class="fa-solid fa-plus"></i>New Post</a>
-  <div class="mt-4 grid gap-4">
+<section class="py-8 max-w-4xl mx-auto">
+  <div class="flex items-center justify-between flex-wrap gap-3 mb-6">
+    <h2 class="text-3xl font-doodle font-bold squiggle-underline" style="color:var(--ink);">Your posts 📝</h2>
+    <a href="{% url 'post_create' %}" class="doodle-btn px-4 py-2 inline-flex items-center gap-2" style="background:var(--blush);">
+      <i class="fa-solid fa-plus"></i>New post
+    </a>
+  </div>
+
+  <div class="mt-2 grid gap-4">
     {% for post in posts %}
-      <div class="card p-4 flex items-center justify-between">
+      <div class="doodle-card p-4 flex items-center justify-between" style="background:var(--paper);">
         <div>
-          <div class="font-semibold">{{ post.title }}</div>
-          <div class="text-sm text-gray-500">{{ post.status }} • {{ post.published_at|default:post.created_at|date:'M d, Y' }}</div>
+          <div class="font-semibold text-gray-800">{{ post.title }}</div>
+          <div class="text-sm text-gray-500 mt-1 flex items-center gap-2">
+            {% if post.status == 'published' %}
+              <span class="status-badge status-published">🌸 Published</span>
+            {% elif post.status == 'pending' %}
+              <span class="status-badge status-pending">⏳ Awaiting approval</span>
+            {% else %}
+              <span class="status-badge status-draft">✎ Draft</span>
+            {% endif %}
+            <span>•</span>
+            <span>{{ post.published_at|default:post.created_at|date:'M d, Y' }}</span>
+          </div>
         </div>
-        <div class="space-x-2">
-          <a href="{% url 'post_edit' post.slug %}" class="text-sm inline-flex items-center gap-2"><i class="fa-regular fa-pen-to-square"></i>Edit</a>
-          <a href="{% url 'post_delete' post.slug %}" class="text-sm text-red-500 inline-flex items-center gap-2"><i class="fa-solid fa-trash"></i>Delete</a>
+        <div class="flex items-center gap-3">
+          <a href="{% url 'post_edit' post.slug %}" class="text-sm doodle-btn px-3 py-1.5 bg-white inline-flex items-center gap-2"><i class="fa-regular fa-pen-to-square"></i>Edit</a>
+          <a href="{% url 'post_delete' post.slug %}" class="text-sm doodle-btn px-3 py-1.5 inline-flex items-center gap-2" style="background:#ffd9d9;"><i class="fa-solid fa-trash"></i>Delete</a>
         </div>
       </div>
     {% empty %}
-      <p class="text-gray-600">You have no posts yet.</p>
+      <div class="doodle-card p-8 text-center" style="background:var(--lilac);">
+        <div class="text-4xl mb-2">🌱</div>
+        <p class="text-gray-700">You have no posts yet — plant your first one!</p>
+      </div>
     {% endfor %}
   </div>
 </section>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+  (function () {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("submitted") === "1") {
+      const status = params.get("status");
+      if (status === "published") {
+        window.mpToast("Your post is live! 🌸", "success");
+      } else if (status === "draft") {
+        window.mpToast("Saved as a draft 📝 — publish it anytime!", "info");
+      } else {
+        window.mpToast("Saved! Your post is awaiting admin approval ⏳", "pending");
+      }
+      // Clean the query params off the URL so refreshing doesn't re-toast
+      if (window.history.replaceState) {
+        window.history.replaceState({}, document.title, window.location.pathname);
+      }
+    }
+  })();
+</script>
 {% endblock %}

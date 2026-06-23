@@ -2,15 +2,16 @@
 {% block title %}Create / Edit Post{% endblock %}
 {% block content %}
 <div class="max-w-3xl mx-auto py-8">
-  <div class="card p-6">
-    <h2 class="text-2xl font-bold text-gray-800">Create / Edit Post</h2>
-    <p class="text-sm text-gray-600 mt-1">Write your post and choose a category, tags and status.</p>
+  <div class="doodle-card p-7 relative" style="background: var(--paper);">
+    <div class="washi-corner" style="background:var(--lilac);"></div>
+    <h2 class="text-3xl font-doodle font-bold squiggle-underline" style="color:var(--ink);">Create / edit post ✏️</h2>
+    <p class="text-sm text-gray-600 mt-4">Write your post and choose a category, tags and status.</p>
 
-    <form method="post" enctype="multipart/form-data" class="mt-6 space-y-4">
+    <form method="post" enctype="multipart/form-data" class="mt-6 space-y-5" id="mp-post-form">
       {% csrf_token %}
 
       {% if form.non_field_errors %}
-        <div class="text-sm text-red-700 bg-red-50 border border-red-100 rounded p-3">
+        <div class="text-sm text-red-700 bg-red-50 border-2 rounded-xl p-3" style="border-color:#fca5a5;">
           {% for err in form.non_field_errors %}{{ err }}{% if not forloop.last %}<br>{% endif %}{% endfor %}
         </div>
       {% endif %}
@@ -38,7 +39,7 @@
         <div>
           {{ form.tags.label_tag }}
           {{ form.tags }}
-          <p class="text-xs text-gray-500 mt-1">Hold Ctrl (or Cmd) to select multiple tags.</p>
+          <p class="text-xs text-gray-500 mt-1">Hold Ctrl (or Cmd) to select multiple tags 🏷️</p>
           {% for error in form.tags.errors %}<p class="text-sm text-red-600 mt-1">{{ error }}</p>{% endfor %}
         </div>
 
@@ -52,20 +53,55 @@
           {{ form.featured_image.label_tag }}
           {% if form.instance and form.instance.featured_image %}
             <div class="mb-2">
-              <img src="{{ form.instance.featured_image.url }}" alt="current image" class="w-48 h-28 object-cover rounded-md shadow-sm" />
+              <img src="{{ form.instance.featured_image.url }}" alt="current image" class="w-48 h-28 object-cover rounded-xl border-2" style="border-color:var(--line);" />
             </div>
           {% endif %}
           {{ form.featured_image }}
-          <p class="text-xs text-gray-500 mt-1">Optional. Recommended image ratio 16:9.</p>
+          <p class="text-xs text-gray-500 mt-1">Optional. Recommended image ratio 16:9 🖼️</p>
           {% for error in form.featured_image.errors %}<p class="text-sm text-red-600 mt-1">{{ error }}</p>{% endfor %}
         </div>
       </div>
 
-      <div class="flex items-center gap-3">
-        <button type="submit" class="px-6 py-3 rounded-xl bg-gradient-to-r from-pink-200 via-purple-200 to-indigo-200 text-gray-800 font-semibold hover:scale-105 transition">Save</button>
-        <a href="{% url 'dashboard' %}" class="px-4 py-2 rounded-lg border border-gray-200 text-gray-700">Cancel</a>
+      <div class="flex items-center gap-3 pt-2">
+        <button type="submit" class="doodle-btn px-6 py-3" style="background: var(--blush);">Save ✦</button>
+        <a href="{% url 'dashboard' %}" class="doodle-btn px-4 py-2 bg-white">Cancel</a>
       </div>
     </form>
   </div>
 </div>
+
+<!-- ===== Pending approval modal (shown after save if status isn't published) ===== -->
+<div id="mp-pending-overlay" class="fixed inset-0 bg-black/30 backdrop-blur-sm z-50 hidden items-center justify-center">
+  <div class="toast-pop doodle-card max-w-sm w-full mx-4 p-6 text-center" style="background: var(--paper);">
+    <div class="text-5xl mb-3">⏳</div>
+    <h3 class="font-doodle text-2xl" style="color:var(--ink);">Sent for a little check-up!</h3>
+    <p class="text-sm text-gray-600 mt-2">Your post has been saved and is waiting for admin approval before it goes live. We'll keep its status updated on your dashboard 🌷</p>
+    <button id="mp-pending-close" class="doodle-btn px-5 py-2 mt-5" style="background: var(--butter);">Got it!</button>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+  (function () {
+    const params = new URLSearchParams(window.location.search);
+    const submitted = params.get("submitted");      // set to "1" by the view after save
+    const status = params.get("status");             // "pending" | "published" | "draft"
+
+    if (submitted === "1") {
+      if (status === "published") {
+        window.mpToast("Your post is live! 🌸", "success");
+      } else {
+        const overlay = document.getElementById("mp-pending-overlay");
+        overlay.classList.remove("hidden");
+        overlay.classList.add("flex");
+        document.getElementById("mp-pending-close").addEventListener("click", () => {
+          overlay.classList.add("hidden");
+          overlay.classList.remove("flex");
+        });
+      }
+    }
+  })();
+</script>
 {% endblock %}

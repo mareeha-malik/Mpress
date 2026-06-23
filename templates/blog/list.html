@@ -1,19 +1,51 @@
 {% extends 'base.html' %}
+{% load static %}
 {% block title %}{{ title }}{% endblock %}
 {% block content %}
-<section class="py-8">
-  <h2 class="text-2xl font-semibold mb-4">{{ title }}</h2>
+<section class="py-8 max-w-5xl mx-auto">
+
+  <div class="doodle-card relative p-6 mb-8 overflow-hidden" style="background: linear-gradient(135deg, var(--lilac) 0%, var(--blush) 100%);">
+    <div class="washi-corner" style="background:var(--sage);"></div>
+    <svg class="doodle-deco" style="top:10px; right:18px; width:34px; opacity:0.5;" viewBox="0 0 24 24" fill="none" stroke="#4a3f4e" stroke-width="1.6"><path d="M4 19h16M4 15h10M4 11h16M4 7h7"/></svg>
+    <h2 class="text-3xl font-doodle font-bold squiggle-underline" style="color:var(--ink);">{{ title }} 🔎</h2>
+  </div>
+
   <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
     {% for post in posts %}
-      <div class="card p-4">
-        <a href="{{ post.get_absolute_url }}" class="text-lg font-semibold">{{ post.title }}</a>
-        <p class="text-sm text-gray-600 mt-2">{{ post.content|truncatechars:120 }}</p>
+      <article class="doodle-card p-4 flex gap-4 items-start" style="background: var(--paper);">
+        <div class="w-24 h-24 flex-shrink-0 rounded-xl overflow-hidden border-2" style="border-color:var(--line);">
+          {% if post.featured_image %}
+            <img src="{{ post.featured_image.url }}" alt="{{ post.title }}" class="w-full h-full object-cover">
+          {% else %}
+            <img src="{% static 'images/default-thumb.svg' %}" alt="{{ post.title }}" class="w-full h-full object-cover">
+          {% endif %}
+        </div>
+        <div class="flex-1">
+          <a href="{{ post.get_absolute_url }}" class="text-lg font-bold text-gray-800 hover:text-pink-500 transition">{{ post.title }}</a>
+          <p class="text-sm text-gray-600 mt-2">{{ post.content|truncatechars:120 }}</p>
+          <div class="mt-3 flex items-center justify-between text-xs text-gray-500">
+            <span class="flex items-center gap-2"><i class="fa-regular fa-calendar"></i>{{ post.published_at|default:post.created_at|date:'M d, Y' }}</span>
+            <a href="{{ post.get_absolute_url }}" class="font-doodle text-base" style="color:var(--blush-deep);">read more →</a>
+          </div>
+        </div>
+      </article>
+    {% empty %}
+      <div class="doodle-card p-10 text-center md:col-span-2" style="background: var(--lilac);">
+        <div class="text-4xl mb-2">🍂</div>
+        <p class="text-gray-700">No posts found here yet — try a different search or check back soon!</p>
       </div>
     {% endfor %}
   </div>
-  <div class="mt-6">
-    {% if posts.has_previous %}<a href="?page={{ posts.previous_page_number }}">Prev</a>{% endif %}
-    {% if posts.has_next %}<a href="?page={{ posts.next_page_number }}">Next</a>{% endif %}
-  </div>
+
+  {% if posts.has_other_pages %}
+    <div class="mt-8 flex justify-center gap-3">
+      {% if posts.has_previous %}
+        <a href="?page={{ posts.previous_page_number }}" class="doodle-btn px-4 py-2 bg-white">← Prev</a>
+      {% endif %}
+      {% if posts.has_next %}
+        <a href="?page={{ posts.next_page_number }}" class="doodle-btn px-4 py-2 bg-white">Next →</a>
+      {% endif %}
+    </div>
+  {% endif %}
 </section>
 {% endblock %}
