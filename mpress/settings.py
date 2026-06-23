@@ -58,7 +58,6 @@ cloudinary.config(
     secure=True
 )
 # Application definition
-
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -66,8 +65,15 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
+    # your apps
+    'accounts',
+    'blog',
+
+    # third-party
     'cloudinary',
     'cloudinary_storage',
+    'humanize',
 ]
 
 # Local apps

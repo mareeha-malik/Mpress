@@ -4,16 +4,7 @@ from .models import Profile
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.exceptions import ValidationError
 
-# settings.py
 
-import sys
-
-if 'test' in sys.argv:
-    STORAGES = {
-        "default": {
-            "BACKEND": "django.core.files.storage.FileSystemStorage",
-        }
-    }
 class ProfileModelTests(TestCase):
 
     def test_profile_created_on_user_creation(self):
