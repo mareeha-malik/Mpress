@@ -23,7 +23,16 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 import os
 from pathlib import Path
 import cloudinary
+# settings.py
 
+import sys
+
+if 'test' in sys.argv:
+    STORAGES = {
+        "default": {
+            "BACKEND": "django.core.files.storage.FileSystemStorage",
+        }
+    }
 from dotenv import load_dotenv
 
 load_dotenv()
