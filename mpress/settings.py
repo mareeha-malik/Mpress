@@ -212,3 +212,10 @@ MEDIA_ROOT = BASE_DIR / 'media'
 CSRF_TRUSTED_ORIGINS = [
     'https://mpress.onrender.com',
 ]
+
+# =========================
+# AUTH REDIRECTS
+# =========================
+LOGIN_URL = 'login'
+LOGIN_REDIRECT_URL = 'home'
+LOGOUT_REDIRECT_URL = 'home'
