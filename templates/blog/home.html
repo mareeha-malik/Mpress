@@ -64,11 +64,11 @@
           {% for r in recent %}
             <li>
               <a href="{{ r.get_absolute_url }}" class="flex items-center gap-3 hover:text-pink-500 transition group">
-                <span class="rounded-xl overflow-hidden border-2 flex-shrink-0" style="border-color:var(--line);">
+                <span class="rounded-lg overflow-hidden border-2 flex-shrink-0" style="border-color:var(--line);">
                   {% if r.featured_image %}
-                    <img src="{{ r.featured_image.url }}" class="w-12 h-12 object-cover" alt="{{ r.title }}">
+                    <img src="{{ r.featured_image.url }}" class="w-16 h-11 object-cover" alt="{{ r.title }}">
                   {% else %}
-                    <img src="{% static 'images/default-thumb.svg' %}" class="w-12 h-12 object-cover" alt="{{ r.title }}">
+                    <img src="{% static 'images/default-thumb.svg' %}" class="w-16 h-11 object-cover" alt="{{ r.title }}">
                   {% endif %}
                 </span>
                 <span>{{ r.title }}</span>
