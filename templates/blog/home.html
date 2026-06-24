@@ -83,7 +83,7 @@
     <div class="lg:col-span-2 space-y-6">
       {% for post in posts %}
       <article class="doodle-card flex gap-6 items-start p-4">
-        <div class="w-36 h-36 flex-shrink-0 rounded-xl overflow-hidden border-2" style="border-color:var(--line);">
+        <div class="w-44 h-32 flex-shrink-0 rounded-xl overflow-hidden border-2" style="border-color:var(--line);">
           {% if post.featured_image %}
             <img src="{{ post.featured_image.url }}" alt="{{ post.title }}" class="w-full h-full object-cover">
           {% else %}
