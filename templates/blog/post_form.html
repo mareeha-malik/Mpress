@@ -1,5 +1,16 @@
 {% extends 'base.html' %}
 {% block title %}Create / Edit Post{% endblock %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.css" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.js"></script>
+<style>
+  #mp-crop-overlay .cropper-view-box,
+  #mp-crop-overlay .cropper-face { border-radius: 0; }
+  #mp-crop-image-wrap { max-height: 60vh; }
+</style>
+{% endblock %}
+
 {% block content %}
 <div class="max-w-3xl mx-auto py-8">
   <div class="doodle-card p-7 relative" style="background: var(--paper);">
@@ -56,8 +67,16 @@
               <img src="{{ form.instance.featured_image.url }}" alt="current image" class="w-48 h-28 object-cover rounded-xl border-2" style="border-color:var(--line);" />
             </div>
           {% endif %}
+
+          <div id="mp-image-preview-wrap" class="mb-3 hidden">
+            <img id="mp-image-preview" class="w-48 h-28 object-cover rounded-xl border-2" style="border-color:var(--line);" alt="cropped preview" />
+            <div>
+              <button type="button" id="mp-recrop-btn" class="doodle-btn px-3 py-1 text-xs mt-2" style="background: var(--lilac);">✂️ Adjust crop</button>
+            </div>
+          </div>
+
           {{ form.featured_image }}
-          <p class="text-xs text-gray-500 mt-1">Optional. Recommended image ratio 16:9 🖼️</p>
+          <p class="text-xs text-gray-500 mt-1">Optional. Pick an image and you'll be able to crop it to 16:9 🖼️</p>
           {% for error in form.featured_image.errors %}<p class="text-sm text-red-600 mt-1">{{ error }}</p>{% endfor %}
         </div>
       </div>
@@ -80,14 +99,30 @@
   </div>
 </div>
 
+<!-- ===== Image crop modal ===== -->
+<div id="mp-crop-overlay" class="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 hidden items-center justify-center px-4">
+  <div class="toast-pop doodle-card max-w-xl w-full p-6" style="background: var(--paper);">
+    <h3 class="font-doodle text-2xl flex items-center gap-2" style="color:var(--ink);">✂️ Crop your image</h3>
+    <p class="text-xs text-gray-500 mt-1 mb-3">Drag to reposition, use the corners to resize. Locked to a 16:9 frame so it fits the cards nicely.</p>
+    <div id="mp-crop-image-wrap">
+      <img id="mp-crop-image" style="max-width:100%; display:block;" />
+    </div>
+    <div class="flex items-center justify-end gap-3 mt-5">
+      <button type="button" id="mp-crop-cancel" class="doodle-btn px-4 py-2 bg-white">Cancel</button>
+      <button type="button" id="mp-crop-apply" class="doodle-btn px-5 py-2" style="background: var(--blush);">Use this crop ✦</button>
+    </div>
+  </div>
+</div>
+
 {% endblock %}
 
 {% block extra_scripts %}
 <script>
   (function () {
+    // ---------- pending-approval toast/modal (unchanged) ----------
     const params = new URLSearchParams(window.location.search);
-    const submitted = params.get("submitted");      // set to "1" by the view after save
-    const status = params.get("status");             // "pending" | "published" | "draft"
+    const submitted = params.get("submitted");
+    const status = params.get("status");
 
     if (submitted === "1") {
       if (status === "published") {
@@ -102,6 +137,98 @@
         });
       }
     }
+
+    // ---------- image crop flow ----------
+    const fileInput = document.getElementById("id_featured_image");
+    if (!fileInput) return; // field id differs only if the form widget was customized
+
+    const cropOverlay = document.getElementById("mp-crop-overlay");
+    const cropImage = document.getElementById("mp-crop-image");
+    const cropApplyBtn = document.getElementById("mp-crop-apply");
+    const cropCancelBtn = document.getElementById("mp-crop-cancel");
+    const previewWrap = document.getElementById("mp-image-preview-wrap");
+    const previewImg = document.getElementById("mp-image-preview");
+    const recropBtn = document.getElementById("mp-recrop-btn");
+
+    let cropper = null;
+    let originalDataUrl = null; // kept so "Adjust crop" can re-open on the same source image
+
+    function openCropper(dataUrl) {
+      cropImage.src = dataUrl;
+      cropOverlay.classList.remove("hidden");
+      cropOverlay.classList.add("flex");
+
+      // Cropper needs the image actually loaded before init
+      if (cropImage.complete) {
+        initCropper();
+      } else {
+        cropImage.onload = initCropper;
+      }
+    }
+
+    function initCropper() {
+      if (cropper) cropper.destroy();
+      cropper = new Cropper(cropImage, {
+        aspectRatio: 16 / 9,
+        viewMode: 1,
+        autoCropArea: 1,
+        background: false,
+        responsive: true,
+      });
+    }
+
+    function closeCropper() {
+      cropOverlay.classList.add("hidden");
+      cropOverlay.classList.remove("flex");
+      if (cropper) {
+        cropper.destroy();
+        cropper = null;
+      }
+    }
+
+    fileInput.addEventListener("change", function () {
+      const file = fileInput.files && fileInput.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        originalDataUrl = e.target.result;
+        openCropper(originalDataUrl);
+      };
+      reader.readAsDataURL(file);
+    });
+
+    recropBtn?.addEventListener("click", function () {
+      if (originalDataUrl) openCropper(originalDataUrl);
+    });
+
+    cropCancelBtn.addEventListener("click", function () {
+      closeCropper();
+      // If they cancel on a first-time pick with no prior crop, clear the input
+      // so they don't end up submitting an uncropped image by accident.
+      if (!previewImg.src) {
+        fileInput.value = "";
+      }
+    });
+
+    cropApplyBtn.addEventListener("click", function () {
+      if (!cropper) return;
+
+      cropper.getCroppedCanvas({ width: 1280, height: 720 }).toBlob(function (blob) {
+        const originalName = (fileInput.files[0] && fileInput.files[0].name) || "featured.jpg";
+        const croppedFile = new File([blob], originalName, { type: blob.type || "image/jpeg" });
+
+        // Swap the cropped file into the real input so Django receives it normally on submit
+        const dt = new DataTransfer();
+        dt.items.add(croppedFile);
+        fileInput.files = dt.files;
+
+        previewImg.src = URL.createObjectURL(blob);
+        previewWrap.classList.remove("hidden");
+
+        closeCropper();
+      }, "image/jpeg", 0.92);
+    });
   })();
 </script>
 {% endblock %}
