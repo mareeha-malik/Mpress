@@ -51,8 +51,11 @@
     <!-- Sidebar -->
     <aside class="lg:col-span-1 space-y-6">
       <div class="doodle-card p-6" style="background: var(--sage);">
-        <h3 class="font-doodle text-2xl flex items-center gap-2" style="color:var(--ink);"><i class="fa-solid fa-leaf"></i> About me</h3>
-        <p class="text-sm text-gray-700 mt-3">I write about <span class="font-semibold">small moments</span>, code, design, and creative living. ✨</p>
+        <h3 class="font-doodle text-2xl flex items-center gap-2" style="color:var(--ink);"><i class="fa-solid fa-leaf"></i> Why MPress</h3>
+        <p class="text-sm text-gray-700 mt-3">A cozy corner where anyone can write — <span class="font-semibold">small moments</span>, code, design, recipes, whatever's on your mind. ✨</p>
+        {% if not user.is_authenticated %}
+          <a href="{% url 'register' %}" class="doodle-btn px-3 py-1.5 text-sm inline-block mt-4" style="background: var(--butter);">Start writing →</a>
+        {% endif %}
       </div>
 
       <div class="doodle-card p-6" style="background: var(--paper);">

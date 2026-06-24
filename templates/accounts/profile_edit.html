@@ -1,21 +1,41 @@
 {% extends 'base.html' %}
 {% block title %}Edit Profile{% endblock %}
 {% block content %}
-<section class="py-12 px-4 max-w-3xl mx-auto">
-  <div class="bg-white/60 backdrop-blur rounded-2xl p-6 shadow border border-white/40">
-    <h2 class="text-xl font-semibold">Edit your profile</h2>
-    <form method="post" enctype="multipart/form-data" class="mt-4 space-y-4">
+<section class="py-10 px-4 max-w-2xl mx-auto">
+  <div class="doodle-card relative p-7" style="background: var(--paper);">
+    <div class="washi-corner" style="background:var(--lilac);"></div>
+    <h2 class="text-3xl font-doodle font-bold squiggle-underline" style="color:var(--ink);">Edit your profile ✎</h2>
+    <p class="text-sm text-gray-600 mt-4">This is your space to tell readers a little about yourself.</p>
+
+    <form method="post" enctype="multipart/form-data" class="mt-6 space-y-5">
       {% csrf_token %}
+
+      {% if form.non_field_errors %}
+        <div class="text-sm text-red-700 bg-red-50 border-2 rounded-xl p-3" style="border-color:#fca5a5;">
+          {% for err in form.non_field_errors %}{{ err }}{% if not forloop.last %}<br>{% endif %}{% endfor %}
+        </div>
+      {% endif %}
+
       <div>
         {{ form.avatar.label_tag }}
+        {% if form.instance and form.instance.avatar %}
+          <div class="mb-2 mt-1">
+            <img src="{{ form.instance.avatar.url }}" alt="current avatar" class="w-20 h-20 rounded-full object-cover border-2" style="border-color:var(--line);" />
+          </div>
+        {% endif %}
         {{ form.avatar }}
+        {% for error in form.avatar.errors %}<p class="text-sm text-red-600 mt-1">{{ error }}</p>{% endfor %}
       </div>
+
       <div>
         {{ form.bio.label_tag }}
         {{ form.bio }}
+        {% for error in form.bio.errors %}<p class="text-sm text-red-600 mt-1">{{ error }}</p>{% endfor %}
       </div>
-      <div>
-        <button class="px-4 py-2 bg-pink-500 text-white rounded">Save</button>
+
+      <div class="flex items-center gap-3 pt-2">
+        <button class="doodle-btn px-6 py-3" style="background: var(--blush);">Save ✦</button>
+        <a href="{% url 'profile_detail' request.user.username %}" class="doodle-btn px-4 py-2 bg-white">Cancel</a>
       </div>
     </form>
   </div>
